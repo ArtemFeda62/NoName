@@ -13,10 +13,10 @@ public class ChangedGravity : MonoBehaviour
     public void FixedUpdate()
     {
         Vector3 gravity = isGravityDown ?
-            Vector3.down * gravityForce * rb.mass :
-            Vector3.up * gravityForce * rb.mass;
+            Vector3.down * gravityForce:
+            Vector3.up * gravityForce;
 
-        rb.AddForce(gravity, ForceMode.Force);
+        rb.AddForce(gravity, ForceMode.Impulse);
     }
     public void ChangeGravity()
     {
