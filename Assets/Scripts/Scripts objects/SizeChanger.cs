@@ -18,6 +18,7 @@ public class SizeChanger : MonoBehaviour
     private void InitializeSize()
     {
         _originalScale = transform.localScale;
+        _minScale = transform.localScale.x;
         _currentScale = transform.localScale;
     }
 
@@ -27,11 +28,10 @@ public class SizeChanger : MonoBehaviour
         {
             _currentScale += Vector3.one * _scaleStep;
             _currentScale = Vector3.Min(_currentScale, Vector3.one * _maxScale);
-            Debug.Log($"Size increased to: {_currentScale.x}");
         }
         else
         {
-            Debug.Log("Cannot increase size further - maximum size reached");
+           
         }
     }
 
@@ -41,18 +41,17 @@ public class SizeChanger : MonoBehaviour
         {
             _currentScale -= Vector3.one * _scaleStep;
             _currentScale = Vector3.Max(_currentScale, Vector3.one * _minScale);
-            Debug.Log($"Size decreased to: {_currentScale.x}");
+
         }
         else
         {
-            Debug.Log("Cannot decrease size further - minimum size reached");
+  
         }
     }
 
     public void ResetToOriginalSize()
     {
         _currentScale = _originalScale;
-        Debug.Log("Size reset to original");
     }
 
     private void FixedUpdate()
