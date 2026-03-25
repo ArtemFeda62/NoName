@@ -243,8 +243,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a0b64e463b50ba4f920d3a6959714f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OpenDoor
-  _button: {fileID: 1728677004}
-  _positionOpen: {x: 0, y: 5, z: 0}
+  _buttonTrigger: {fileID: 0}
+  _openPosition: {x: 0, y: 5, z: 0}
+  _openSpeed: 0.01
 --- !u!1 &241806407
 GameObject:
   m_ObjectHideFlags: 0
@@ -619,7 +620,7 @@ Transform:
   m_GameObject: {fileID: 458916674}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.80537, y: 0.64, z: 5.4634}
+  m_LocalPosition: {x: -0.80537, y: 0.074, z: 5.4634}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1036,7 +1037,6 @@ GameObject:
   - component: {fileID: 1365017764}
   - component: {fileID: 1365017763}
   - component: {fileID: 1365017768}
-  - component: {fileID: 1365017770}
   - component: {fileID: 1365017769}
   m_Layer: 0
   m_Name: Cube
@@ -1058,6 +1058,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Selecrable
   rb: {fileID: 0}
+  Mass: 0
 --- !u!65 &1365017764
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1144,7 +1145,7 @@ Transform:
   m_GameObject: {fileID: 1365017762}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.44, y: 0.84, z: 9.01459}
+  m_LocalPosition: {x: -6.44, y: 0.91, z: 9.24}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1189,20 +1190,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c5fc64c22a01b44a81664067cf983c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChangedGravity
-  gravityForce: 9.81
-  rb: {fileID: 0}
---- !u!114 &1365017770
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1365017762}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83dd917770ed0984fa55ed240a058d0b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Resising
+  _gravityForce: 9.81
 --- !u!1 &1426998216
 GameObject:
   m_ObjectHideFlags: 0
@@ -1620,7 +1608,7 @@ GameObject:
   - component: {fileID: 1714895147}
   - component: {fileID: 1714895146}
   - component: {fileID: 1714895145}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: w
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1766,7 +1754,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f2bf837fb2070842a7c35b5547e8c76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClickButton
-  massForButton: 1
+  _requiredMass: 1
+  _pressDistance: 0.1
 --- !u!65 &1728677005
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1857,7 +1846,6 @@ GameObject:
   - component: {fileID: 2081524948}
   - component: {fileID: 2081524947}
   - component: {fileID: 2081524946}
-  - component: {fileID: 2081524945}
   - component: {fileID: 2081524944}
   m_Layer: 0
   m_Name: Sphere
@@ -1893,18 +1881,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &2081524945
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2081524943}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83dd917770ed0984fa55ed240a058d0b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Resising
 --- !u!114 &2081524946
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1918,6 +1894,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Selectable
   rb: {fileID: 0}
+  Mass: 0
 --- !u!135 &2081524947
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2025,7 +2002,6 @@ GameObject:
   - component: {fileID: 2131929042}
   - component: {fileID: 2131929043}
   - component: {fileID: 2131929044}
-  - component: {fileID: 2131929045}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -2174,18 +2150,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4390834ad24f0a469d643ca4171a7ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  currentSpeed: 0
-  walkSpeed: 5
-  sprintSpeed: 12
-  jumpHeight: 2
-  gravity: -15
+  _walkSpeed: 5
+  _sprintSpeed: 10
+  _jumpHeight: 2
+  _gravity: -9.81
+  _maxStamina: 10
+  _staminaDrainRate: 1
+  _staminaRegenRate: 2
   _characterController: {fileID: 2131929038}
-  _cinCam: {fileID: 1488787893}
-  groundCheck: {fileID: 1604095584}
-  groundDistance: 0.2
-  groundMask:
+  _cinemachineCamera: {fileID: 1488787893}
+  _groundCheck: {fileID: 0}
+  _groundDistance: 0.4
+  _groundMask:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 0
 --- !u!114 &2131929044
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2198,35 +2176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e1f1a3b56e430b41b0888a098e5f87c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerRay
-  _cinCam: {fileID: 1488787893}
-  CurrentSelectable: {fileID: 0}
---- !u!54 &2131929045
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2131929037}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  _cinemachineCamera: {fileID: 1488787893}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

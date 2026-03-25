@@ -70,7 +70,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Button1",
+                    "name": "ToolSize",
                     "type": "Button",
                     "id": "35b80bf6-4776-43b9-b7b6-71ff69cca2b8",
                     "expectedControlType": "",
@@ -79,7 +79,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Button2",
+                    "name": "ToolGravity",
                     "type": "Button",
                     "id": "6baca1a9-5794-4528-a010-57e6e7c783fb",
                     "expectedControlType": "",
@@ -88,7 +88,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "MouseForward",
+                    "name": "ScaleIncrease",
                     "type": "Value",
                     "id": "918dd267-3f5d-4efe-b18e-eab401e23a85",
                     "expectedControlType": "",
@@ -97,7 +97,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "MouseBack",
+                    "name": "ScaleDecrease",
                     "type": "Value",
                     "id": "776a841c-1763-46c3-9306-ac4a3165700c",
                     "expectedControlType": "",
@@ -118,15 +118,6 @@
                     "name": "Button3",
                     "type": "Button",
                     "id": "0e428396-f90e-4da1-a009-62bb5b780ca2",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "RunButton",
-                    "type": "Button",
-                    "id": "a11ee635-085d-444c-908e-96cfaef1d6bd",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -482,7 +473,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Button1",
+                    "action": "ToolSize",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -493,7 +484,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Button2",
+                    "action": "ToolGravity",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -504,7 +495,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "MouseForward",
+                    "action": "ScaleIncrease",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -515,7 +506,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "MouseBack",
+                    "action": "ScaleDecrease",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -538,17 +529,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Button3",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "f8ab067e-bc03-4c24-a7c9-7488bcf594ad",
-                    "path": "<Keyboard>/w",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "RunButton",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
