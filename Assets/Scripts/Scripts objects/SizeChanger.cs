@@ -76,4 +76,8 @@ public class SizeChanger : MonoBehaviour
     {
         return (_currentScale.x - _minScale) / (_maxScale - _minScale);
     }
+    public void SetOriginalScale()
+    {
+        _currentScale = _originalScale;
+    }
 }

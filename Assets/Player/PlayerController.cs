@@ -175,13 +175,4 @@ public class PlayerController : MonoBehaviour
             _currentSpeed = _walkSpeed;
         }
     }
-
-    private void OnDrawGizmosSelected()
-    {
-        if (_groundCheck != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(_groundCheck.position, _groundDistance);
-        }
-    }
 }
