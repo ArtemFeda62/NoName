@@ -17,7 +17,7 @@ public class BreakableCube : MonoBehaviour
             foreach (Rigidbody piece in pieces)
             {
                 piece.isKinematic = false;
-                piece.AddForce(Random.onUnitSphere * 5f, ForceMode.Impulse);
+                piece.AddForce(Random.onUnitSphere * 25f, ForceMode.Impulse);
             }
             Destroy(gameObject);
         }
