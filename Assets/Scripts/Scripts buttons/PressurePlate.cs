@@ -13,6 +13,7 @@ public class PressurePlate : MonoBehaviour
     [SerializeField] private UnityEvent onReleased;
 
     [Header("Визуал")]
+    [SerializeField] private Transform _visualPart; // Явно указываем визуальную часть
     [SerializeField] private float _pressOffset = 0.1f;
     [SerializeField] private float _pressDuration = 0.3f;
 
@@ -20,6 +21,21 @@ public class PressurePlate : MonoBehaviour
     private bool _isPressed = false;
     private bool _alreadyUsed = false;
     private Coroutine _visualCoroutine;
+    private Vector3 _originalPosition;
+
+    private void Start()
+    {
+        // Сохраняем оригинальную позицию
+        if (_visualPart != null)
+        {
+            _originalPosition = _visualPart.localPosition;
+            Debug.Log($"Оригинальная позиция сохранена: {_originalPosition}");
+        }
+        else
+        {
+            Debug.LogError("Привяжите визуальную часть кнопки в поле Visual Part!");
+        }
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -29,6 +45,7 @@ public class PressurePlate : MonoBehaviour
         if (rb != null)
         {
             _currentMass += rb.mass;
+            Debug.Log($"{other.name} наступил. Масса: {_currentMass}/{_requiredMass}");
             UpdateState();
         }
     }
@@ -41,6 +58,7 @@ public class PressurePlate : MonoBehaviour
         if (rb != null)
         {
             _currentMass -= rb.mass;
+            Debug.Log($"{other.name} ушел. Масса: {_currentMass}/{_requiredMass}");
             UpdateState();
         }
     }
@@ -52,47 +70,56 @@ public class PressurePlate : MonoBehaviour
         if (shouldBePressed && !_isPressed)
         {
             _isPressed = true;
+            Debug.Log("КНОПКА НАЖАТА!");
+
+            if (_visualCoroutine != null) StopCoroutine(_visualCoroutine);
+            _visualCoroutine = StartCoroutine(AnimatePress(true));
+
             onPressed.Invoke();
             if (_oneTimeOnly) _alreadyUsed = true;
         }
         else if (!shouldBePressed && _isPressed)
         {
             _isPressed = false;
+            Debug.Log("КНОПКА ОТЖАТА!");
+
+            if (_visualCoroutine != null) StopCoroutine(_visualCoroutine);
+            _visualCoroutine = StartCoroutine(AnimatePress(false));
+
             onReleased.Invoke();
         }
     }
 
-    private void VisualizePress(bool press)
+    private IEnumerator AnimatePress(bool pressed)
     {
-        if (_visualCoroutine != null)
-            StopCoroutine(_visualCoroutine);
-        _visualCoroutine = StartCoroutine(AnimatePress(press));
-    }
+        if (_visualPart == null) yield break;
 
-    private IEnumerator AnimatePress(bool press)
-    {
-        Transform visual = transform.GetChild(1);
-        if (visual == null) yield break;
+        Vector3 startPos = _visualPart.localPosition;
+        Vector3 endPos;
 
-        Vector3 startPos = visual.localPosition;
-        Vector3 targetPos = startPos;
-        targetPos.y = press ? -_pressOffset : 0f;
-
-        float elapsed = 0f;
-        while (elapsed < _pressDuration)
+        if (pressed)
         {
-            elapsed += Time.deltaTime;
-            float t = elapsed / _pressDuration;
-            visual.localPosition = Vector3.Lerp(startPos, targetPos, t);
+            endPos = _originalPosition;
+            endPos.y -= _pressOffset;
+            Debug.Log($"Анимация: опускаемся до {endPos.y}");
+        }
+        else
+        {
+            endPos = _originalPosition;
+            Debug.Log($"Анимация: поднимаемся до {endPos.y}");
+        }
+
+        float time = 0;
+        while (time < _pressDuration)
+        {
+            time += Time.deltaTime;
+            float t = time / _pressDuration;
+            _visualPart.localPosition = Vector3.Lerp(startPos, endPos, t);
             yield return null;
         }
-        visual.localPosition = targetPos;
-        _visualCoroutine = null;
-    }
 
-    private void OnEnable()
-    {
-        onPressed.AddListener(() => VisualizePress(true));
-        onReleased.AddListener(() => VisualizePress(false));
+        _visualPart.localPosition = endPos;
+        Debug.Log($"Анимация завершена. Позиция: {_visualPart.localPosition.y}");
+        _visualCoroutine = null;
     }
 }
