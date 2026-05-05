@@ -17,9 +17,18 @@ public class PlayerRay : MonoBehaviour
 
     private ConfigurableJoint _grabJoint;
 
+    public Selectable CurrentSelectable => _currentSelectable;
+    public string CurrentTool => _currentTool;
+    public bool IsItemPicked => _isItemPicked;
+
     private void LateUpdate()
     {
         LookAtSelectableObject();
+    }
+
+    public bool CanPickupCurrent()
+    {
+        return !_isItemPicked && _currentSelectable != null && _currentSelectable.GetComponent<Rigidbody>() != null;
     }
 
     private void LookAtSelectableObject()
@@ -142,7 +151,7 @@ public class PlayerRay : MonoBehaviour
         _currentSelectable.transform.SetParent(null);
 
         rb.isKinematic = false;
-        rb.useGravity = false; // Отключаем гравитацию для поднятого предмета
+        rb.useGravity = false; 
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
@@ -203,7 +212,7 @@ public class PlayerRay : MonoBehaviour
         if (rb != null)
         {
             rb.isKinematic = false;
-            rb.useGravity = true; // Включаем гравитацию обратно
+            rb.useGravity = true; 
         }
 
         _pickedItem = null;
