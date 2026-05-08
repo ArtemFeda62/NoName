@@ -3,23 +3,44 @@ using UnityEngine;
 public class BreakableCube : MonoBehaviour
 {
     [SerializeField] private GameObject _destroyedCubePrefab;
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip _breakSound;
+    [SerializeField] private float _breakForce = 25f;
+    [SerializeField] private float _minVelocityToBreak = 3f;
+
     private bool isDestroy = false;
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!isDestroy)
+        if (isDestroy) return;
+
+        float impactVelocity = collision.relativeVelocity.magnitude;
+
+        if (impactVelocity >= _minVelocityToBreak)
         {
-            isDestroy = true;
-            Vector3 spawnPosition = transform.position;
-            Quaternion spawnRotation = transform.rotation;
-            GameObject destroyedCube = Instantiate(_destroyedCubePrefab, spawnPosition, spawnRotation);
-            Rigidbody[] pieces = destroyedCube.GetComponentsInChildren<Rigidbody>();
-            foreach (Rigidbody piece in pieces)
-            {
-                piece.isKinematic = false;
-                piece.AddForce(Random.onUnitSphere * 25f, ForceMode.Impulse);
-            }
-            Destroy(gameObject);
+            BreakCube();
         }
+    }
+
+    private void BreakCube()
+    {
+        if (isDestroy) return;
+        isDestroy = true;
+
+        if (_breakSound != null && _audioSource != null)
+        {
+            _audioSource.PlayOneShot(_breakSound, 1f);
+        }
+
+        GameObject destroyedCube = Instantiate(_destroyedCubePrefab, transform.position, transform.rotation);
+
+        Rigidbody[] pieces = destroyedCube.GetComponentsInChildren<Rigidbody>();
+        foreach (Rigidbody piece in pieces)
+        {
+            piece.isKinematic = false;
+            piece.AddForce(Random.onUnitSphere * _breakForce, ForceMode.Impulse);
+        }
+
+        Destroy(gameObject);
     }
 }
