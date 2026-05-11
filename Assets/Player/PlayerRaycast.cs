@@ -8,6 +8,7 @@ public class PlayerRay : MonoBehaviour
     [SerializeField] private CinemachineCamera _cinemachineCamera;
     [SerializeField] private Transform _grabPoint;
     [SerializeField] private LayerMask _ignoreMask;
+    [SerializeField] private Animator _handAnimator;
 
     private string _currentTool = "size";
     private Selectable _currentSelectable;
@@ -20,6 +21,21 @@ public class PlayerRay : MonoBehaviour
     public Selectable CurrentSelectable => _currentSelectable;
     public string CurrentTool => _currentTool;
     public bool IsItemPicked => _isItemPicked;
+
+    private void Start()
+    {
+        _handAnimator = GetComponent<Animator>();
+
+        if (_handAnimator != null)
+        {
+            Debug.Log("Animator найден на объекте: " + gameObject.name);
+            _handAnimator.SetBool("isHolding", false);
+        }
+        else
+        {
+            Debug.LogError("Animator НЕ найден на объекте: " + gameObject.name + "! Перетащите Animator в поле Hand Animator в инспекторе");
+        }
+    }
 
     private void LateUpdate()
     {
@@ -39,7 +55,7 @@ public class PlayerRay : MonoBehaviour
         Ray ray = new Ray(_cinemachineCamera.transform.position, rayDirection);
         Debug.DrawRay(_cinemachineCamera.transform.position, rayDirection * _rayDistance, Color.red);
 
-        if (Physics.Raycast(ray, out RaycastHit hit, _rayDistance,~_ignoreMask))
+        if (Physics.Raycast(ray, out RaycastHit hit, _rayDistance, ~_ignoreMask))
         {
             Selectable selectable = hit.collider.GetComponent<Selectable>();
             HandleSelectable(selectable);
@@ -129,6 +145,8 @@ public class PlayerRay : MonoBehaviour
 
     public void OnPickupButton()
     {
+        Debug.Log("OnPickupButton вызван, isItemPicked = " + _isItemPicked + ", currentSelectable = " + (_currentSelectable != null ? _currentSelectable.name : "null"));
+
         if (!_isItemPicked && _currentSelectable != null)
         {
             PickupItemPhysical();
@@ -141,6 +159,8 @@ public class PlayerRay : MonoBehaviour
 
     private void PickupItemPhysical()
     {
+        Debug.Log("PickupItemPhysical начат");
+
         Rigidbody rb = _currentSelectable.GetComponent<Rigidbody>();
         if (rb == null)
         {
@@ -151,23 +171,20 @@ public class PlayerRay : MonoBehaviour
         _currentSelectable.transform.SetParent(null);
 
         rb.isKinematic = false;
-        rb.useGravity = false; 
+        rb.useGravity = false;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
         _grabJoint = _currentSelectable.gameObject.AddComponent<ConfigurableJoint>();
         _grabJoint.connectedBody = _grabPoint.GetComponent<Rigidbody>();
 
-        // Настройка линейного движения с демпфированием
         _grabJoint.xMotion = ConfigurableJointMotion.Limited;
         _grabJoint.yMotion = ConfigurableJointMotion.Limited;
         _grabJoint.zMotion = ConfigurableJointMotion.Limited;
 
-        // Увеличиваем лимит для более естественного движения
         _grabJoint.linearLimit = new SoftJointLimit { limit = 0.1f };
         _grabJoint.linearLimitSpring = new SoftJointLimitSpring { spring = 1000f, damper = 500f };
 
-        // Добавляем drive для позиционирования
         JointDrive positionDrive = new JointDrive
         {
             positionSpring = 1000f,
@@ -179,7 +196,6 @@ public class PlayerRay : MonoBehaviour
         _grabJoint.yDrive = positionDrive;
         _grabJoint.zDrive = positionDrive;
 
-        // Полностью ограничиваем вращение
         _grabJoint.angularXMotion = ConfigurableJointMotion.Locked;
         _grabJoint.angularYMotion = ConfigurableJointMotion.Locked;
         _grabJoint.angularZMotion = ConfigurableJointMotion.Locked;
@@ -198,11 +214,24 @@ public class PlayerRay : MonoBehaviour
             _currentSelectable = null;
         }
 
+        Debug.Log("Попытка включить анимацию, _handAnimator = " + (_handAnimator != null ? "не null" : "null"));
+        if (_handAnimator != null)
+        {
+            _handAnimator.SetBool("isHolding", true);
+            Debug.Log("Анимация включена (isHolding = true)");
+        }
+        else
+        {
+            Debug.LogError("_handAnimator == null! Не удалось включить анимацию");
+        }
+
         Debug.Log("Предмет поднят");
     }
 
     private void DropItemPhysical()
     {
+        Debug.Log("DropItemPhysical начат");
+
         if (_pickedItem == null) return;
 
         if (_grabJoint != null)
@@ -212,12 +241,22 @@ public class PlayerRay : MonoBehaviour
         if (rb != null)
         {
             rb.isKinematic = false;
-            rb.useGravity = true; 
+            rb.useGravity = true;
         }
 
         _pickedItem = null;
         _isItemPicked = false;
         _grabJoint = null;
+
+        if (_handAnimator != null)
+        {
+            _handAnimator.SetBool("isHolding", false);
+            Debug.Log("Анимация выключена (isHolding = false)");
+        }
+        else
+        {
+            Debug.LogError("_handAnimator == null! Не удалось выключить анимацию");
+        }
 
         Debug.Log("Предмет отпущен");
     }
