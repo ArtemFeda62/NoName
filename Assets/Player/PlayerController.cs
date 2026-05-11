@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    #region Поля и компоненты
+
     [Header("Movement")]
     [SerializeField] private float _walkSpeed = 5f;
     [SerializeField] private float _sprintSpeed = 10f;
@@ -31,24 +33,17 @@ public class PlayerController : MonoBehaviour
     private bool _isRunning;
     private float _stamina;
     private float _staminaTimer;
-
     private float _fallTimer;
     private readonly float _terminalVelocity = 20f;
+
+    #endregion
+
+
+    #region Жизненный цикл (Unity Events)
 
     private void Start()
     {
         InitializePlayer();
-    }
-
-    private void InitializePlayer()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        _currentSpeed = _walkSpeed;
-        _stamina = _maxStamina;
-
-        if (_groundCheck == null)
-            _groundCheck = transform;
     }
 
     private void Update()
@@ -64,13 +59,33 @@ public class PlayerController : MonoBehaviour
         MoveCharacter();
     }
 
-    private void HandleInput()
+    #endregion
+
+
+    #region Инициализация
+
+    private void InitializePlayer()
     {
-        if (_isRunning && _stamina < 1)
-        {
-            _isRunning = false;
-            _currentSpeed = _walkSpeed;
-        }
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        _currentSpeed = _walkSpeed;
+        _stamina = _maxStamina;
+
+        if (_groundCheck == null)
+            _groundCheck = transform;
+    }
+
+    #endregion
+
+
+    #region Движение и физика
+
+    private void MoveCharacter()
+    {
+        Vector3 moveDirection = (GetForwardDirection() * _moveInput.y + GetRightDirection() * _moveInput.x).normalized;
+        Vector3 finalMovement = moveDirection * _currentSpeed * Time.fixedDeltaTime;
+        finalMovement += _velocity * Time.fixedDeltaTime;
+        _characterController.Move(finalMovement);
     }
 
     private void CheckGrounded()
@@ -103,13 +118,24 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void MoveCharacter()
+    private Vector3 GetForwardDirection()
     {
-        Vector3 moveDirection = (GetForwardDirection() * _moveInput.y + GetRightDirection() * _moveInput.x).normalized;
-        Vector3 finalMovement = moveDirection * _currentSpeed * Time.fixedDeltaTime;
-        finalMovement += _velocity * Time.fixedDeltaTime;
-        _characterController.Move(finalMovement);
+        Vector3 forward = _cinemachineCamera.transform.forward;
+        forward.y = 0;
+        return forward.normalized;
     }
+
+    private Vector3 GetRightDirection()
+    {
+        Vector3 right = _cinemachineCamera.transform.right;
+        right.y = 0;
+        return right.normalized;
+    }
+
+    #endregion
+
+
+    #region Выносливость (Stamina)
 
     private void UpdateStamina()
     {
@@ -135,18 +161,18 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private Vector3 GetForwardDirection()
-    {
-        Vector3 forward = _cinemachineCamera.transform.forward;
-        forward.y = 0;
-        return forward.normalized;
-    }
+    #endregion
 
-    private Vector3 GetRightDirection()
+
+    #region Обработка ввода (Input System)
+
+    private void HandleInput()
     {
-        Vector3 right = _cinemachineCamera.transform.right;
-        right.y = 0;
-        return right.normalized;
+        if (_isRunning && _stamina < 1)
+        {
+            _isRunning = false;
+            _currentSpeed = _walkSpeed;
+        }
     }
 
     public void OnMove(InputValue value)
@@ -175,4 +201,6 @@ public class PlayerController : MonoBehaviour
             _currentSpeed = _walkSpeed;
         }
     }
+
+    #endregion
 }
