@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ChangerSize : MonoBehaviour
+public class FieldChangerSize : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {

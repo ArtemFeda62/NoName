@@ -17,6 +17,7 @@ public class Piston : MonoBehaviour
     private Vector3 _initialPosition;
     private Vector3 _extendedPosition;
     private bool _isMoving = false;
+    private bool _isExtended = false;
 
     private void Start()
     {
@@ -31,23 +32,49 @@ public class Piston : MonoBehaviour
     {
         if (_isMoving) return;
 
-        StartCoroutine(PistonAction());
+        if (_isExtended && _autoRetract)
+        {
+            StartCoroutine(RetractPiston());
+        }
+        else if (!_isExtended)
+        {
+            StartCoroutine(ExtendPiston());
+        }
     }
 
-    private IEnumerator PistonAction()
+    public void Extend()
+    {
+        if (_isMoving || _isExtended) return;
+        StartCoroutine(ExtendPiston());
+    }
+
+    public void Retract()
+    {
+        if (_isMoving || !_isExtended) return;
+        StartCoroutine(RetractPiston());
+    }
+
+    private IEnumerator ExtendPiston()
     {
         _isMoving = true;
-
         yield return StartCoroutine(MovePiston(_extendedPosition, _extendSpeed));
-
+        _isExtended = true;
         PushObjects();
 
         if (_autoRetract)
         {
             yield return new WaitForSeconds(_retractDelay);
-            yield return StartCoroutine(MovePiston(_initialPosition, _extendSpeed));
+            yield return StartCoroutine(RetractPiston());
         }
 
+        _isMoving = false;
+    }
+
+    private IEnumerator RetractPiston()
+    {
+        _isMoving = true;
+        yield return StartCoroutine(MovePiston(_initialPosition, _extendSpeed));
+        _isExtended = false;
         _isMoving = false;
     }
 
@@ -55,10 +82,12 @@ public class Piston : MonoBehaviour
     {
         float journey = 0f;
         Vector3 startPosition = _pistonHead.position;
+        float distance = Vector3.Distance(startPosition, targetPosition);
+        float duration = distance / speed;
 
         while (journey < 1f)
         {
-            journey += Time.deltaTime * speed;
+            journey += Time.deltaTime / duration;
             _pistonHead.position = Vector3.Lerp(startPosition, targetPosition, journey);
             yield return null;
         }
@@ -80,16 +109,19 @@ public class Piston : MonoBehaviour
                 Debug.Log($"Толкнули объект: {hit.name} с силой {_pushForce}");
             }
         }
+    }
 
-        RaycastHit hitInfo;
-        if (Physics.Raycast(_pistonHead.position, transform.up, out hitInfo, 1f, _pushableLayers))
+    private void OnDrawGizmosSelected()
+    {
+        if (_pistonHead != null)
         {
-            Rigidbody rb = hitInfo.collider.GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                rb.AddForce(transform.up * _pushForce, ForceMode.Impulse);
-                Debug.Log($"Raycast толкнул объект: {hitInfo.collider.name}");
-            }
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(_pistonHead.position, 0.5f);
+
+            Gizmos.color = Color.blue;
+            Vector3 extendedPos = _pistonHead.position + _pistonHead.up * _extendDistance;
+            Gizmos.DrawLine(_pistonHead.position, extendedPos);
+            Gizmos.DrawWireSphere(extendedPos, 0.3f);
         }
     }
 }

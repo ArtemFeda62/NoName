@@ -24,12 +24,11 @@ public class PlayerRay : MonoBehaviour
 
     private void Start()
     {
-        _handAnimator = GetComponent<Animator>();
 
         if (_handAnimator != null)
         {
             Debug.Log("Animator найден на объекте: " + gameObject.name);
-            _handAnimator.SetBool("isHolding", false);
+            _handAnimator.SetBool("IsHolding", false);
         }
         else
         {
@@ -217,8 +216,8 @@ public class PlayerRay : MonoBehaviour
         Debug.Log("Попытка включить анимацию, _handAnimator = " + (_handAnimator != null ? "не null" : "null"));
         if (_handAnimator != null)
         {
-            _handAnimator.SetBool("isHolding", true);
-            Debug.Log("Анимация включена (isHolding = true)");
+            _handAnimator.SetBool("IsHolding", true);
+            Debug.Log("Анимация включена (IsHolding = true)");
         }
         else
         {
@@ -250,8 +249,8 @@ public class PlayerRay : MonoBehaviour
 
         if (_handAnimator != null)
         {
-            _handAnimator.SetBool("isHolding", false);
-            Debug.Log("Анимация выключена (isHolding = false)");
+            _handAnimator.SetBool("IsHolding", false);
+            Debug.Log("Анимация выключена (IsHolding = false)");
         }
         else
         {

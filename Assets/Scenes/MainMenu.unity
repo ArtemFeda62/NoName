@@ -971,10 +971,10 @@ RectTransform:
   - {fileID: 829167132}
   m_Father: {fileID: 1713892036}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.14364393, y: 0.59800005}
-  m_AnchorMax: {x: 0.34835607, y: 0.6953704}
-  m_AnchoredPosition: {x: -5.479126, y: -213}
-  m_SizeDelta: {x: 10.958313, y: 5.1056976}
+  m_AnchorMin: {x: 0.14364393, y: 0.40100002}
+  m_AnchorMax: {x: 0.34835607, y: 0.5}
+  m_AnchoredPosition: {x: -5.479126, y: -1}
+  m_SizeDelta: {x: 10.958313, y: 3.1056976}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1572528703
 MonoBehaviour:

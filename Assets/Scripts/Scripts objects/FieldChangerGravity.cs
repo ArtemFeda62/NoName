@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ChangerGravity : MonoBehaviour
+public class FieldChangerGravity : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
