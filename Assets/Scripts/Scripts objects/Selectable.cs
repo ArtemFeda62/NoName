@@ -12,6 +12,12 @@ public class Selectable : MonoBehaviour
     [SerializeField] private float _minVelocityForSound = 5f;
     [SerializeField] private float _maxVolumeVelocity = 10f;
 
+    [Header("Неоновые осколки")]
+    [SerializeField] private GameObject _neonDebrisPrefab;  
+    [SerializeField] private int _debrisCount = 6;        
+    [SerializeField] private float _debrisForce = 4f;      
+    [SerializeField] private float _minVelocityForDebris = 10f; 
+
     private Renderer _renderer;
     private Color _defaultColor;
 
@@ -49,6 +55,35 @@ public class Selectable : MonoBehaviour
         {
             float volume = Mathf.Clamp01(velocity / _maxVolumeVelocity);
             _audioSource.PlayOneShot(_hitSound, volume);
+        }
+
+        if (velocity >= _minVelocityForDebris && _neonDebrisPrefab != null)
+        {
+            ContactPoint contact = collision.contacts[0];
+            Vector3 hitPoint = contact.point;
+            Vector3 hitNormal = contact.normal;
+            SpawnNeonDebris(hitPoint, hitNormal);
+        }
+    }
+
+    private void SpawnNeonDebris(Vector3 position, Vector3 normal)
+    {
+        for (int i = 0; i < _debrisCount; i++)
+        {
+            GameObject debris = Instantiate(_neonDebrisPrefab, position, Random.rotation);
+
+            float randomScale = Random.Range(0.15f, 0.35f);
+            debris.transform.localScale = Vector3.one * randomScale;
+
+            Rigidbody rbDebris = debris.GetComponent<Rigidbody>();
+            if (rbDebris != null)
+            {
+                Vector3 direction = normal + Random.insideUnitSphere;
+                direction.Normalize();
+                rbDebris.AddForce(direction * _debrisForce, ForceMode.Impulse);
+
+                rbDebris.AddTorque(Random.insideUnitSphere * 3f, ForceMode.Impulse);
+            }
         }
     }
 

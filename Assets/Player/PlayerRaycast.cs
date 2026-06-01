@@ -8,8 +8,7 @@ public class PlayerRay : MonoBehaviour
     [SerializeField] private CinemachineCamera _cinemachineCamera;
     [SerializeField] private Transform _grabPoint;
     [SerializeField] private LayerMask _ignoreMask;
-    [SerializeField] private Animator _handAnimator;
-
+    [SerializeField] private HandRotation _handRotation;
     private string _currentTool = "size";
     private Selectable _currentSelectable;
     private Selectable _pickedItem;
@@ -22,19 +21,6 @@ public class PlayerRay : MonoBehaviour
     public string CurrentTool => _currentTool;
     public bool IsItemPicked => _isItemPicked;
 
-    private void Start()
-    {
-
-        if (_handAnimator != null)
-        {
-            Debug.Log("Animator найден на объекте: " + gameObject.name);
-            _handAnimator.SetBool("IsHolding", false);
-        }
-        else
-        {
-            Debug.LogError("Animator НЕ найден на объекте: " + gameObject.name + "! Перетащите Animator в поле Hand Animator в инспекторе");
-        }
-    }
 
     private void LateUpdate()
     {
@@ -213,16 +199,8 @@ public class PlayerRay : MonoBehaviour
             _currentSelectable = null;
         }
 
-        Debug.Log("Попытка включить анимацию, _handAnimator = " + (_handAnimator != null ? "не null" : "null"));
-        if (_handAnimator != null)
-        {
-            _handAnimator.SetBool("IsHolding", true);
-            Debug.Log("Анимация включена (IsHolding = true)");
-        }
-        else
-        {
-            Debug.LogError("_handAnimator == null! Не удалось включить анимацию");
-        }
+        if (_handRotation != null)
+            _handRotation.StartRotation();
 
         Debug.Log("Предмет поднят");
     }
@@ -247,15 +225,8 @@ public class PlayerRay : MonoBehaviour
         _isItemPicked = false;
         _grabJoint = null;
 
-        if (_handAnimator != null)
-        {
-            _handAnimator.SetBool("IsHolding", false);
-            Debug.Log("Анимация выключена (IsHolding = false)");
-        }
-        else
-        {
-            Debug.LogError("_handAnimator == null! Не удалось выключить анимацию");
-        }
+        if (_handRotation != null)
+            _handRotation.StopRotation();
 
         Debug.Log("Предмет отпущен");
     }
