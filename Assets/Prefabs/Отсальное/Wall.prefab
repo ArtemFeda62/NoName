@@ -68,6 +68,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BreakableCube
   _destroyedCubePrefab: {fileID: 9103283966228458930, guid: 9a05e85413b801f4abf73f6f7c45b6b5, type: 3}
+  _audioSource: {fileID: 0}
+  _breakSound: {fileID: 0}
+  _breakForce: 25
+  _minVelocityToBreak: 3
 --- !u!1 &3571103925048338627
 GameObject:
   m_ObjectHideFlags: 0
@@ -134,7 +138,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: af3ecfd349c78ff4dab42b0a411fd1b2, type: 2}
+  - {fileID: 2100000, guid: 264e4705c000ba6479bbadb7e8444d33, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
