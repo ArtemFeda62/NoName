@@ -1,133 +1,50 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+using static UnityEngine.InputSystem.Controls.AxisControl;
+
 public class PressurePlate : MonoBehaviour
 {
-    [Header("Настройки кнопки")]
-    [SerializeField] private float _requiredMass = 1f;
-    [SerializeField] private bool _oneTimeOnly = false;
+    [SerializeField] private float _massObject = 20f;
+    [SerializeField] private Vector3 _positionDown;
+    [SerializeField] private Vector3 _positionStart;
+    [SerializeField] private bool _isPressed = false;
 
-    [Header("Связь с объектами")]
-    [SerializeField] private UnityEvent onPressed;
-    [SerializeField] private UnityEvent onReleased;
-
-    [Header("Визуал (опционально)")]
-    [SerializeField] private Transform _visualPart;
-    [SerializeField] private float _pressOffset = 0.1f;
-
-    private float _currentMass = 0f;
-    private bool _isPressed = false;
-    private bool _alreadyUsed = false;
-    private Vector3 _originalPosition;
-    private Vector3 _pressedPosition;
+    [Header("События")]
+    public UnityEvent _onPressed; 
+    public UnityEvent _onReleased;
 
     private void Start()
     {
-        if (_visualPart != null)
-        {
-            _originalPosition = _visualPart.localPosition;
-            _pressedPosition = _originalPosition;
-            _pressedPosition.y -= _pressOffset;
-        }
+        _positionStart = transform.position;
+        _positionDown = new Vector3(transform.position.x, transform.position.y - 0.5f, transform.position.z);
     }
-
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (_oneTimeOnly && _alreadyUsed) return;
-
-        Rigidbody rb = other.attachedRigidbody;
-        if (rb != null)
-        {
-            _currentMass += rb.mass;
-            Debug.Log($"{other.name} наступил. Масса: {_currentMass}/{_requiredMass}");
-            UpdateState();
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (_oneTimeOnly && _alreadyUsed) return;
-
-        Rigidbody rb = other.attachedRigidbody;
-        if (rb != null)
-        {
-            _currentMass -= rb.mass;
-            Debug.Log($"{other.name} ушел. Масса: {_currentMass}/{_requiredMass}");
-            UpdateState();
-
-            UpdateVisual();
-        }
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (_oneTimeOnly && _alreadyUsed) return;
-
-        if (other.attachedRigidbody == null)
-        {
-            _currentMass = _requiredMass;
-            UpdateState();
-        }
-    }
-
-    private void UpdateState()
-    {
-        bool shouldBePressed = _currentMass >= _requiredMass;
-
-        if (shouldBePressed && !_isPressed)
+        if (collision.rigidbody.mass >= _massObject)
         {
             _isPressed = true;
-            Debug.Log("КНОПКА НАЖАТА!");
-            UpdateVisual();
-            onPressed.Invoke();
-
-            if (_oneTimeOnly)
-                _alreadyUsed = true;
-        }
-        else if (!shouldBePressed && _isPressed)
-        {
-            _isPressed = false;
-            Debug.Log("КНОПКА ОТЖАТА!");
-            UpdateVisual();
-            onReleased.Invoke();
+            UpdateButton();
+            _onPressed?.Invoke();
         }
     }
-
-    private void UpdateVisual()
+    private void OnCollisionExit(Collision collision)
     {
-        if (_visualPart == null) return;
-
-        if (_isPressed)
-        {
-            _visualPart.localPosition = _pressedPosition;
-            Debug.Log($"Визуал: кнопка нажата (позиция: {_pressedPosition.y})");
-        }
-        else
-        {
-            _visualPart.localPosition = _originalPosition;
-            Debug.Log($"Визуал: кнопка отжата (позиция: {_originalPosition.y})");
-        }
+        _isPressed = false;
+        UpdateButton();
+        _onReleased?.Invoke();
     }
 
-    public void ResetPlate()
+    private void UpdateButton()
     {
-        if (_oneTimeOnly)
+        if(_isPressed)
         {
-            _alreadyUsed = false;
-            _isPressed = false;
-            _currentMass = 0f;
-            UpdateVisual();
+            gameObject.transform.localPosition = Vector3.Lerp(transform.position, _positionDown, Time.deltaTime * 2f);
         }
-    }
-
-    public bool IsPressed()
-    {
-        return _isPressed;
-    }
-
-    public void ClearMass()
-    {
-        _currentMass = 0f;
-        UpdateState();
+        else if(_isPressed==false)
+        {
+            gameObject.transform.localPosition = Vector3.Lerp(transform.position, _positionStart, Time.deltaTime * 2f);
+        }
     }
 }

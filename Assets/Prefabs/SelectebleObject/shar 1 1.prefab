@@ -63,7 +63,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 5d174fcbf2f5e004dad8a79f11d21a4e, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: 61d98fde28309a949859abe60f79da62, type: 2}
+      objectReference: {fileID: 2100000, guid: 482e015006ea1674eb4cc7bb99071fd0, type: 2}
     - target: {fileID: 919132149155446097, guid: 5d174fcbf2f5e004dad8a79f11d21a4e, type: 3}
       propertyPath: m_Name
       value: shar 1 1
@@ -77,9 +77,6 @@ PrefabInstance:
       addedObject: {fileID: 353709843596980252}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5d174fcbf2f5e004dad8a79f11d21a4e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1174344728270923031}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5d174fcbf2f5e004dad8a79f11d21a4e, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 3877717830895142308}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5d174fcbf2f5e004dad8a79f11d21a4e, type: 3}
       insertIndex: -1
@@ -87,6 +84,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5d174fcbf2f5e004dad8a79f11d21a4e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5510636512220877752}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5d174fcbf2f5e004dad8a79f11d21a4e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4372090690824956736}
   m_SourcePrefab: {fileID: 100100000, guid: 5d174fcbf2f5e004dad8a79f11d21a4e, type: 3}
 --- !u!1 &5082487237431988700 stripped
 GameObject:
@@ -116,21 +116,6 @@ CapsuleCollider:
   m_Height: 0.018576453
   m_Direction: 1
   m_Center: {x: -4.656613e-10, y: 0, z: 0.0000111944955}
---- !u!114 &1174344728270923031
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5082487237431988700}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f7c14a517468c624baa0c685473481d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SizeChanger
-  _scaleStep: 0.1
-  _minScale: 0.1
-  _maxScale: 10
 --- !u!114 &3877717830895142308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -194,3 +179,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &4372090690824956736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5082487237431988700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7c14a517468c624baa0c685473481d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SizeChanger
+  _scaleStep: 5
+  _minScale: 30
+  _maxScale: 250

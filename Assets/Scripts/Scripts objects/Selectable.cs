@@ -19,7 +19,8 @@ public class Selectable : MonoBehaviour
     [SerializeField] private float _minVelocityForDebris = 10f; 
 
     private Renderer _renderer;
-    private Color _defaultColor;
+    private Material _material;
+    private Color _color;
 
     public void Start()
     {
@@ -31,7 +32,10 @@ public class Selectable : MonoBehaviour
 
         _renderer = GetComponent<Renderer>();
         if (_renderer != null)
-            _defaultColor = _renderer.material.color;
+        {
+            _material = _renderer.material;
+            _color = _renderer.material.color;
+        }
 
         if (_audioSource == null)
         {
@@ -96,6 +100,9 @@ public class Selectable : MonoBehaviour
     public void Deselect()
     {
         if (_renderer != null)
-            _renderer.material.color = Color.gray;
+        {
+            _renderer.material = _material;
+            _renderer.material.color = _color;
+        }
     }
 }

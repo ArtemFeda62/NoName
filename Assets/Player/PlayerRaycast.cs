@@ -1,6 +1,7 @@
 using System;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PlayerRay : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class PlayerRay : MonoBehaviour
     public Selectable CurrentSelectable => _currentSelectable;
     public string CurrentTool => _currentTool;
     public bool IsItemPicked => _isItemPicked;
+
 
 
     private void LateUpdate()
@@ -146,6 +148,22 @@ public class PlayerRay : MonoBehaviour
     {
         Debug.Log("PickupItemPhysical начат");
 
+        if (_currentSelectable == null)
+        {
+            Debug.LogError("_currentSelectable = null! Нельзя поднять предмет");
+            return;
+        }
+
+        Interact interact = _currentSelectable.GetComponent<Interact>();
+        if (interact != null)
+        {
+            interact.DroppeedFalse();
+        }
+        else
+        {
+            Debug.LogWarning($"На {_currentSelectable.name} нет компонента Interact");
+        }
+
         Rigidbody rb = _currentSelectable.GetComponent<Rigidbody>();
         if (rb == null)
         {
@@ -160,8 +178,21 @@ public class PlayerRay : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
+        if (_grabPoint == null)
+        {
+            Debug.LogError("_grabPoint не назначен в инспекторе!");
+            return;
+        }
+
+        Rigidbody grabPointRb = _grabPoint.GetComponent<Rigidbody>();
+        if (grabPointRb == null)
+        {
+            Debug.LogError("У _grabPoint нет Rigidbody!");
+            return;
+        }
+
         _grabJoint = _currentSelectable.gameObject.AddComponent<ConfigurableJoint>();
-        _grabJoint.connectedBody = _grabPoint.GetComponent<Rigidbody>();
+        _grabJoint.connectedBody = grabPointRb;
 
         _grabJoint.xMotion = ConfigurableJointMotion.Limited;
         _grabJoint.yMotion = ConfigurableJointMotion.Limited;
@@ -209,7 +240,17 @@ public class PlayerRay : MonoBehaviour
     {
         Debug.Log("DropItemPhysical начат");
 
-        if (_pickedItem == null) return;
+        if (_pickedItem == null)
+        {
+            Debug.LogWarning("_pickedItem = null, нечего бросать");
+            return;
+        }
+
+        Interact interact = _pickedItem.GetComponent<Interact>();
+        if (interact != null)
+        {
+            interact.DroppeedTrue();
+        }
 
         if (_grabJoint != null)
             Destroy(_grabJoint);
