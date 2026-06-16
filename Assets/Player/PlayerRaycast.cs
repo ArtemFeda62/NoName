@@ -17,16 +17,21 @@ public class PlayerRay : MonoBehaviour
     private const float _rayDistance = 5f;
 
     private ConfigurableJoint _grabJoint;
+    private LampSlot _lastSlot;
 
     public Selectable CurrentSelectable => _currentSelectable;
     public string CurrentTool => _currentTool;
     public bool IsItemPicked => _isItemPicked;
 
-
-
     private void LateUpdate()
     {
         LookAtSelectableObject();
+
+        if (_isItemPicked && _pickedItem == null)
+        {
+            Debug.Log("Предмет в руках был уничтожен! Очищаем состояние...");
+            ForceDropItem();
+        }
     }
 
     public bool CanPickupCurrent()
@@ -134,6 +139,12 @@ public class PlayerRay : MonoBehaviour
     {
         Debug.Log("OnPickupButton вызван, isItemPicked = " + _isItemPicked + ", currentSelectable = " + (_currentSelectable != null ? _currentSelectable.name : "null"));
 
+        if (_isItemPicked && _pickedItem == null)
+        {
+            ForceDropItem();
+            return;
+        }
+
         if (!_isItemPicked && _currentSelectable != null)
         {
             PickupItemPhysical();
@@ -154,21 +165,26 @@ public class PlayerRay : MonoBehaviour
             return;
         }
 
-        Interact interact = _currentSelectable.GetComponent<Interact>();
-        if (interact != null)
-        {
-            interact.DroppeedFalse();
-        }
-        else
-        {
-            Debug.LogWarning($"На {_currentSelectable.name} нет компонента Interact");
-        }
-
         Rigidbody rb = _currentSelectable.GetComponent<Rigidbody>();
         if (rb == null)
         {
             Debug.LogWarning("У предмета нет Rigidbody");
             return;
+        }
+
+        Lamp lamp = _currentSelectable.GetComponent<Lamp>();
+        if (lamp != null && lamp.IsInSlot())
+        {
+            _lastSlot = lamp.GetSlot();
+            if (_lastSlot != null)
+            {
+                _lastSlot.RemoveLamp();
+                Debug.Log($"Лампа {lamp.name} извлечена из слота {_lastSlot.name} при поднятии");
+            }
+        }
+        else
+        {
+            _lastSlot = null;
         }
 
         _currentSelectable.transform.SetParent(null);
@@ -242,14 +258,9 @@ public class PlayerRay : MonoBehaviour
 
         if (_pickedItem == null)
         {
-            Debug.LogWarning("_pickedItem = null, нечего бросать");
+            Debug.LogWarning("_pickedItem = null, предмет был уничтожен!");
+            ForceDropItem();
             return;
-        }
-
-        Interact interact = _pickedItem.GetComponent<Interact>();
-        if (interact != null)
-        {
-            interact.DroppeedTrue();
         }
 
         if (_grabJoint != null)
@@ -262,6 +273,7 @@ public class PlayerRay : MonoBehaviour
             rb.useGravity = true;
         }
 
+        _lastSlot = null;
         _pickedItem = null;
         _isItemPicked = false;
         _grabJoint = null;
@@ -270,5 +282,29 @@ public class PlayerRay : MonoBehaviour
             _handRotation.StopRotation();
 
         Debug.Log("Предмет отпущен");
+    }
+
+    private void ForceDropItem()
+    {
+        Debug.Log("Принудительный сброс предмета (был уничтожен)");
+
+        if (_grabJoint != null)
+        {
+            Destroy(_grabJoint);
+            _grabJoint = null;
+        }
+        _pickedItem = null;
+        _isItemPicked = false;
+        _lastSlot = null;
+
+        if (_handRotation != null)
+            _handRotation.StopRotation();
+
+        Debug.Log("Состояние игрока очищено");
+    }
+
+    private void OnDestroy()
+    {
+        ForceDropItem();
     }
 }
