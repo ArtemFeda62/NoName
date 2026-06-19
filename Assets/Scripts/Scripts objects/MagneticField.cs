@@ -15,9 +15,9 @@ public class MagneticField : MonoBehaviour
 
     [Header("Ёффекты")]
     [SerializeField] private ParticleSystem _magneticParticles;
-    [SerializeField] private AudioSource _audioSource;
     [SerializeField] private AudioClip _magneticSound;
     [SerializeField] private float _soundCooldown = 1f;
+    [SerializeField] private AudioSource _audioSource;
 
     private List<Rigidbody> _objectsInField = new List<Rigidbody>();
     private float _lastSoundTime = 0f;
@@ -67,6 +67,7 @@ public class MagneticField : MonoBehaviour
         if (rb != null && !_objectsInField.Contains(rb))
         {
             _objectsInField.Add(rb);
+            _audioSource.PlayOneShot(_magneticSound, 0.5f);
             Debug.Log($"ќбъект {other.name} попал в магнитное поле");
         }
     }
@@ -133,7 +134,6 @@ public class MagneticField : MonoBehaviour
 
             if (_audioSource != null && _magneticSound != null && Time.time > _lastSoundTime + _soundCooldown)
             {
-                _audioSource.PlayOneShot(_magneticSound, 0.3f);
                 _lastSoundTime = Time.time;
             }
         }

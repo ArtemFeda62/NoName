@@ -8,6 +8,7 @@ public class Button : MonoBehaviour
     [SerializeField] private float _requiredWeight = 1f;
     [SerializeField] private float _pressDepth = 0.1f;
     [SerializeField] private float _returnSpeed = 5f;
+    [SerializeField] private string _targetTag = "Cube";
 
     [Header("Ссылки")]
     [SerializeField] private Transform _pressPoint;
@@ -59,6 +60,8 @@ public class Button : MonoBehaviour
     {
         if (_isPressed) return;
 
+        if (!other.CompareTag(_targetTag)) return;
+
         Rigidbody rb = other.attachedRigidbody;
         if (rb != null && rb.mass >= _requiredWeight)
         {
@@ -68,6 +71,8 @@ public class Button : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
+        if (!other.CompareTag(_targetTag)) return;
+
         if (_isPressed && _currentObjectOnButton == other.gameObject)
         {
             ReleaseButton();
@@ -88,13 +93,13 @@ public class Button : MonoBehaviour
 
         foreach (Lamp lamp in _connectedLamps)
         {
-            if (lamp != null)
+            if (lamp != null && lamp._currentSlot != null)
                 lamp.TurnOn();
         }
 
         OnButtonPressed?.Invoke();
 
-        Debug.Log($"Кнопка {gameObject.name} нажата, включено ламп: {_connectedLamps.Count}");
+        Debug.Log($"Кнопка {gameObject.name} нажата объектом {obj.name}, включено ламп: {_connectedLamps.Count}");
     }
 
     private void ReleaseButton()
@@ -106,7 +111,7 @@ public class Button : MonoBehaviour
         foreach (Lamp lamp in _connectedLamps)
         {
             if (lamp != null)
-                lamp.TurnOff();  
+                lamp.TurnOff();
         }
 
         OnButtonReleased?.Invoke();

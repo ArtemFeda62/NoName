@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class BreakableCube : MonoBehaviour
 {
@@ -7,6 +8,8 @@ public class BreakableCube : MonoBehaviour
     [SerializeField] private AudioClip _breakSound;
     [SerializeField] private float _breakForce = 25f;
     [SerializeField] private float _minVelocityToBreak = 3f;
+    [SerializeField] private float _destroyDelay = 0.5f;
+    [SerializeField] private Object _visualWall;
 
     private bool isDestroy = false;
 
@@ -18,6 +21,7 @@ public class BreakableCube : MonoBehaviour
 
         if (impactVelocity >= _minVelocityToBreak)
         {
+            Destroy(_visualWall);
             BreakCube();
         }
     }
@@ -30,6 +34,11 @@ public class BreakableCube : MonoBehaviour
         if (_breakSound != null && _audioSource != null)
         {
             _audioSource.PlayOneShot(_breakSound, 1f);
+            Debug.Log("Звук разрушения воспроизведён");
+        }
+        else
+        {
+            Debug.LogWarning("Звук или AudioSource не назначены!");
         }
 
         GameObject destroyedCube = Instantiate(_destroyedCubePrefab, transform.position, transform.rotation);
@@ -41,6 +50,6 @@ public class BreakableCube : MonoBehaviour
             piece.AddForce(Random.onUnitSphere * _breakForce, ForceMode.Impulse);
         }
 
-        Destroy(gameObject);
+        Destroy(gameObject, _destroyDelay);
     }
 }

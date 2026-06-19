@@ -6,25 +6,25 @@ public class Lamp : MonoBehaviour
     [SerializeField] private Material _materialOn;
     [SerializeField] private Material _materialOff;
     [SerializeField] private Renderer _lampRenderer;
-    [SerializeField] private Light _lightSource;
 
     [Header("Звуки")]
-    [SerializeField] private AudioSource _audioSource;
     [SerializeField] private AudioClip _turnOnSound;
     [SerializeField] private AudioClip _turnOffSound;
+    [SerializeField] private AudioSource _audioSource;
 
     private bool _isOn = false;
-    private LampSlot _currentSlot = null;
-
+    public LampSlot _currentSlot = null;
 
     private void Start()
     {
         if (_lampRenderer == null)
             _lampRenderer = GetComponent<Renderer>();
+        _lampRenderer.material = _materialOff;
 
+        if (_audioSource == null)
+            _audioSource = GetComponent<AudioSource>();
         TurnOff();
     }
-
 
     public void TurnOn()
     {
@@ -34,9 +34,6 @@ public class Lamp : MonoBehaviour
 
         if (_lampRenderer != null && _materialOn != null)
             _lampRenderer.material = _materialOn;
-
-        if (_lightSource != null)
-            _lightSource.enabled = true;
 
         if (_audioSource != null && _turnOnSound != null)
             _audioSource.PlayOneShot(_turnOnSound);
@@ -57,9 +54,6 @@ public class Lamp : MonoBehaviour
 
         if (_lampRenderer != null && _materialOff != null)
             _lampRenderer.material = _materialOff;
-
-        if (_lightSource != null)
-            _lightSource.enabled = false;
 
         if (_audioSource != null && _turnOffSound != null)
             _audioSource.PlayOneShot(_turnOffSound);
@@ -87,10 +81,7 @@ public class Lamp : MonoBehaviour
         _currentSlot = slot;
         Debug.Log($"Лампа {gameObject.name} {(slot != null ? $"установлена в слот {slot.name}" : "извлечена из слота")}");
     }
-
     public bool IsInSlot() => _currentSlot != null;
 
     public LampSlot GetSlot() => _currentSlot;
-
-
 }

@@ -48,14 +48,52 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -4936905747293763950, guid: 0255818c91645874d82f5743b90111f7, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 9ae7614aadf4d5c4d83d0d6b5d6cc4a6, type: 2}
     - target: {fileID: 919132149155446097, guid: 0255818c91645874d82f5743b90111f7, type: 3}
       propertyPath: m_Name
       value: Lamp
       objectReference: {fileID: 0}
+    - target: {fileID: 2849821338866572018, guid: 0255818c91645874d82f5743b90111f7, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 16407d0ac50556946b68b1de6eb1c12d, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 65702495048144492, guid: 0255818c91645874d82f5743b90111f7, type: 3}
     - {fileID: -8700617353114198275, guid: 0255818c91645874d82f5743b90111f7, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0255818c91645874d82f5743b90111f7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3794626501068914732}
   m_SourcePrefab: {fileID: 100100000, guid: 0255818c91645874d82f5743b90111f7, type: 3}
+--- !u!1 &5099768342308195684 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0255818c91645874d82f5743b90111f7, type: 3}
+  m_PrefabInstance: {fileID: 5334352784388862005}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3794626501068914732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5099768342308195684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cee501f3e890968438f27a7d5bdcc127, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Lamp
+  _materialOn: {fileID: 2100000, guid: 3da621cebe1b66349be1e264b058c56c, type: 2}
+  _materialOff: {fileID: 2100000, guid: 16407d0ac50556946b68b1de6eb1c12d, type: 2}
+  _lampRenderer: {fileID: 7893672087358106311}
+  _turnOnSound: {fileID: 0}
+  _turnOffSound: {fileID: 0}
+--- !u!23 &7893672087358106311 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2849821338866572018, guid: 0255818c91645874d82f5743b90111f7, type: 3}
+  m_PrefabInstance: {fileID: 5334352784388862005}
+  m_PrefabAsset: {fileID: 0}

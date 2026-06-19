@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Laser : MonoBehaviour
 {
@@ -16,8 +17,8 @@ public class Laser : MonoBehaviour
 
     [Header("Ёффекты")]
     [SerializeField] private ParticleSystem _hitParticles;
-    [SerializeField] private AudioSource _audioSource;
     [SerializeField] private AudioClip _hitSound;
+    private AudioSource _audioSource;
 
     private Vector3 _laserEndPoint;
     private GameObject _currentHitObject;
@@ -87,17 +88,21 @@ public class Laser : MonoBehaviour
             _currentHitObject = hit.collider.gameObject;
 
             _currentDestroyable = _currentHitObject.GetComponent<LaserDestroyable>();
-
+            if(_currentDestroyable != null && _currentDestroyable.GetComponent<PlayerController>()!= null)
+            {
+                Time.timeScale = 1f;
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            }
             if (_hitParticles != null)
             {
                 _hitParticles.transform.position = hit.point;
                 _hitParticles.transform.rotation = Quaternion.LookRotation(hit.normal);
 
-                if (!_hitParticles.isPlaying)
+                if (!_hitParticles.isPlaying && _currentDestroyable != null)
                     _hitParticles.Play();
             }
 
-            if (_audioSource != null && _hitSound != null && !_audioSource.isPlaying)
+            if (_audioSource != null && _hitSound != null && !_audioSource.isPlaying && _currentDestroyable != null)
             {
                 _audioSource.PlayOneShot(_hitSound, 0.3f);
             }

@@ -12,8 +12,8 @@ public class PistonWithSlot : MonoBehaviour
 
     [Header("Ёффекты")]
     [SerializeField] private ParticleSystem _extendParticles;
-    [SerializeField] private AudioSource _audioSource;
     [SerializeField] private AudioClip _extendSound;
+    [SerializeField] private AudioSource _audioSource;
 
     [Header("—лот дл€ лампы")]
     [SerializeField] private LampSlot _lampSlot;

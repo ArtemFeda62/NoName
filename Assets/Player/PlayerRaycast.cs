@@ -26,7 +26,6 @@ public class PlayerRay : MonoBehaviour
     private void LateUpdate()
     {
         LookAtSelectableObject();
-
         if (_isItemPicked && _pickedItem == null)
         {
             Debug.Log("Предмет в руках был уничтожен! Очищаем состояние...");
@@ -173,12 +172,14 @@ public class PlayerRay : MonoBehaviour
         }
 
         Lamp lamp = _currentSelectable.GetComponent<Lamp>();
+   
         if (lamp != null && lamp.IsInSlot())
         {
             _lastSlot = lamp.GetSlot();
             if (_lastSlot != null)
             {
                 _lastSlot.RemoveLamp();
+                lamp.TurnOff();
                 Debug.Log($"Лампа {lamp.name} извлечена из слота {_lastSlot.name} при поднятии");
             }
         }
@@ -255,6 +256,8 @@ public class PlayerRay : MonoBehaviour
     private void DropItemPhysical()
     {
         Debug.Log("DropItemPhysical начат");
+
+        Lamp lamp = _pickedItem.GetComponent<Lamp>();
 
         if (_pickedItem == null)
         {

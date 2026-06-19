@@ -8,9 +8,9 @@ public class DoorWithSlot : MonoBehaviour
     [SerializeField] private float _moveSpeed = 3f;
 
     [Header("«вуки")]
-    [SerializeField] private AudioSource _audioSource;
     [SerializeField] private AudioClip _openSound;
     [SerializeField] private AudioClip _closeSound;
+    [SerializeField] private AudioSource _audioSource;
 
     [Header("—лот дл€ лампы")]
     [SerializeField] private LampSlot _lampSlot;
@@ -19,6 +19,7 @@ public class DoorWithSlot : MonoBehaviour
     private bool _isOpen = false;
     private bool _isMoving = false;
     private bool _hasLampInSlot = false;
+    private bool _isClosing = false;
 
     private void Start()
     {
@@ -31,7 +32,7 @@ public class DoorWithSlot : MonoBehaviour
         {
             _lampSlot.OnLampTurnedOn.AddListener(OnLampInSlotTurnedOn);
             _lampSlot.OnLampTurnedOff.AddListener(OnLampInSlotTurnedOff);
-            Debug.Log($" ƒ¬≈–№ {gameObject.name}: ѕодписана на событи€ слота");
+            Debug.Log($"ƒ¬≈–№ {gameObject.name}: ѕодписана на событи€ слота");
         }
         else
         {
@@ -56,6 +57,7 @@ public class DoorWithSlot : MonoBehaviour
             {
                 _isMoving = false;
                 _doorTransform.localPosition = targetPos;
+                _isClosing = false;
             }
         }
     }
@@ -68,30 +70,37 @@ public class DoorWithSlot : MonoBehaviour
             return;
         }
 
-        Debug.Log($"=== ƒ¬≈–№ {gameObject.name}: лампа в слоте");
+        Debug.Log($"ƒ¬≈–№ {gameObject.name}: лампа в слоте, открываю");
         OpenDoor();
     }
 
     private void OnLampInSlotTurnedOff()
     {
+        Debug.Log($"ƒ¬≈–№ {gameObject.name}: лампа выключилась");
 
-        if (_isOpen)
+        if (_isOpen || _isMoving)
         {
-            Debug.Log($"ƒ¬≈–№ {gameObject.name}: закрываю");
             CloseDoor();
         }
     }
 
     private void OpenDoor()
     {
-        if (_isOpen || _isMoving)
+        if (_isOpen && !_isMoving)
         {
-            Debug.Log($"ƒ¬≈–№ {gameObject.name}: уже открыта или двигаетс€");
+            Debug.Log($"ƒ¬≈–№ {gameObject.name}: уже открыта");
+            return;
+        }
+
+        if (_isMoving && !_isClosing)
+        {
+            Debug.Log($"ƒ¬≈–№ {gameObject.name}: уже открываетс€");
             return;
         }
 
         _isOpen = true;
         _isMoving = true;
+        _isClosing = false;
 
         if (_audioSource != null && _openSound != null)
             _audioSource.PlayOneShot(_openSound);
@@ -101,14 +110,21 @@ public class DoorWithSlot : MonoBehaviour
 
     private void CloseDoor()
     {
-        if (!_isOpen || _isMoving)
+        if (!_isOpen && !_isMoving)
         {
-            Debug.Log($"ƒ¬≈–№ {gameObject.name}: уже закрыта или двигаетс€ ");
+            Debug.Log($"ƒ¬≈–№ {gameObject.name}: уже закрыта");
+            return;
+        }
+
+        if (_isMoving && _isClosing)
+        {
+            Debug.Log($"ƒ¬≈–№ {gameObject.name}: уже закрываетс€");
             return;
         }
 
         _isOpen = false;
         _isMoving = true;
+        _isClosing = true;
 
         if (_audioSource != null && _closeSound != null)
             _audioSource.PlayOneShot(_closeSound);
