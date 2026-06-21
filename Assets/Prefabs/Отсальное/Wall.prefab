@@ -73,6 +73,8 @@ MonoBehaviour:
   _breakSound: {fileID: 8300000, guid: fa7716ffe2d08b84199985e9c5bd6e04, type: 3}
   _breakForce: 25
   _minVelocityToBreak: 3
+  _destroyDelay: 0.5
+  _visualWall: {fileID: 0}
 --- !u!82 &1286557780176837479
 AudioSource:
   m_ObjectHideFlags: 0
@@ -236,7 +238,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: af4699c57cd3f82458c0821617c989a2, type: 2}
+  - {fileID: 2100000, guid: f08de6419d607c04e9dfb302694e7f66, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

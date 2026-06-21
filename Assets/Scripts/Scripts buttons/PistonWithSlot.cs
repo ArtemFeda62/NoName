@@ -7,7 +7,8 @@ public class PistonWithSlot : MonoBehaviour
     [SerializeField] private float _extendDistance = 0.5f;
     [SerializeField] private float _moveSpeed = 5f;
     [SerializeField] private float _pauseDuration = 0.5f;
-    [SerializeField] private float _pushForce = 10f;
+    [SerializeField] private float _pushForce = 50f;
+    [SerializeField] private float _pushRadius = 1.5f;
     [SerializeField] private LayerMask _pushLayers = -1;
 
     [Header("Эффекты")]
@@ -32,7 +33,7 @@ public class PistonWithSlot : MonoBehaviour
             _pistonHead = transform;
 
         _retractedPosition = _pistonHead.localPosition;
-        _extendedPosition = _retractedPosition + _pistonHead.forward * _extendDistance;
+        _extendedPosition = _retractedPosition + Vector3.forward * _extendDistance;
 
         if (_lampSlot != null)
         {
@@ -128,18 +129,24 @@ public class PistonWithSlot : MonoBehaviour
     private void PushObjects()
     {
         Vector3 pushCenter = _pistonHead.position + _pistonHead.forward * (_extendDistance / 2);
-        float pushRadius = 0.5f;
 
-        Collider[] hitColliders = Physics.OverlapSphere(pushCenter, pushRadius, _pushLayers);
+        Debug.Log($"Толчок в центре: {pushCenter}, радиус: {_pushRadius}");
+
+        Collider[] hitColliders = Physics.OverlapSphere(pushCenter, _pushRadius, _pushLayers);
+
+        Debug.Log($"Найдено объектов в радиусе: {hitColliders.Length}");
 
         foreach (Collider hit in hitColliders)
         {
             Rigidbody rb = hit.attachedRigidbody;
             if (rb != null && hit.gameObject != gameObject)
             {
-                Vector3 pushDirection = _pistonHead.forward;
+                Vector3 pushDirection = (hit.transform.position - pushCenter).normalized;
+                pushDirection.y = 0;
+                pushDirection.Normalize();
+
                 rb.AddForce(pushDirection * _pushForce, ForceMode.Impulse);
-                Debug.Log($"Поршень {gameObject.name} толкнул объект {hit.gameObject.name}");
+                Debug.Log($"Поршень {gameObject.name} толкнул объект {hit.gameObject.name} силой {_pushForce}, направление: {pushDirection}");
             }
         }
     }
@@ -157,9 +164,13 @@ public class PistonWithSlot : MonoBehaviour
     {
         if (_pistonHead != null)
         {
-            Gizmos.color = Color.red;
             Vector3 pushCenter = _pistonHead.position + _pistonHead.forward * (_extendDistance / 2);
-            Gizmos.DrawWireSphere(pushCenter, 0.5f);
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(pushCenter, _pushRadius);
+
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(pushCenter, 0.2f);
         }
     }
 }

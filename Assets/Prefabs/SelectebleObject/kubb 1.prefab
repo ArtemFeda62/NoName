@@ -95,6 +95,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 294e2e936d8fa604e922d5e9ee8ddad5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2270253049280329929}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 294e2e936d8fa604e922d5e9ee8ddad5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 202962587113274341}
   m_SourcePrefab: {fileID: 100100000, guid: 294e2e936d8fa604e922d5e9ee8ddad5, type: 3}
 --- !u!1 &7392082134925784942 stripped
 GameObject:
@@ -200,3 +203,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GravityChanger
   _gravityForce: 9.81
   _startWithGravityDown: 1
+--- !u!114 &202962587113274341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7392082134925784942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad6b68790b7b39f4381f991549511d56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LaserDestroyable
+  _destroyDelay: 0.2
+  _destroyOnLaserHit: 1
+  _checkForLampInSlot: 1
+  _destroyEffectPrefab: {fileID: 0}
+  _destroySound: {fileID: 0}
+  _soundVolume: 1
+  _indestructible: 0
+  _invulnerabilityTime: 1

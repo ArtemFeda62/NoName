@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using System.Collections;
 
 public class LampSlot : MonoBehaviour
 {
@@ -7,12 +8,19 @@ public class LampSlot : MonoBehaviour
     [SerializeField] private Transform _lampHolderPoint;
     [SerializeField] private Vector3 _lampOffset = new Vector3(0, 1.5f, 0);
 
+    [Header("Камера слота")]
+    [SerializeField] private Camera _slotCamera;
+    [SerializeField] private RenderTexture _renderTexture;
+    [SerializeField] private GameObject _uiImageObject;
+    [SerializeField] private float _cameraDuration = 2f;
+
     [Header("События")]
     public UnityEvent OnLampTurnedOn;
     public UnityEvent OnLampTurnedOff;
 
     private Lamp _currentLamp;
     private bool _hasLamp = false;
+    private Coroutine _cameraCoroutine;
 
     private Vector3 _originalScale;
     private Transform _originalParent;
@@ -26,6 +34,17 @@ public class LampSlot : MonoBehaviour
     {
         if (_lampHolderPoint == null)
             _lampHolderPoint = transform;
+
+        if (_slotCamera != null)
+        {
+            _slotCamera.targetTexture = _renderTexture;
+            _slotCamera.enabled = false;
+        }
+
+        if (_uiImageObject != null)
+        {
+            _uiImageObject.SetActive(false);
+        }
     }
 
     [System.Obsolete]
@@ -104,6 +123,7 @@ public class LampSlot : MonoBehaviour
         {
             OnLampTurnedOn?.Invoke();
             Debug.Log($"Слот {gameObject.name}: лампа включена, активирую события");
+            ActivateSlotCamera();
         }
         else
         {
@@ -117,7 +137,7 @@ public class LampSlot : MonoBehaviour
         if (!_hasLamp || _currentLamp == null) return;
 
         Debug.Log($"Лампа {_currentLamp.name} извлекается из слота {gameObject.name}");
-        
+
         Lamp removedLamp = _currentLamp;
         bool wasLampOn = removedLamp.IsOn();
 
@@ -149,6 +169,62 @@ public class LampSlot : MonoBehaviour
         _hasLamp = false;
 
         Debug.Log($"Лампа {removedLamp.name} извлечена из слота {gameObject.name}");
+    }
+
+    public void ActivateSlotCamera()
+    {
+        if (_cameraCoroutine != null)
+            StopCoroutine(_cameraCoroutine);
+
+        _cameraCoroutine = StartCoroutine(ShowCameraCoroutine());
+    }
+
+    public void DeactivateSlotCamera()
+    {
+        if (_cameraCoroutine != null)
+        {
+            StopCoroutine(_cameraCoroutine);
+            _cameraCoroutine = null;
+        }
+
+        if (_slotCamera != null)
+            _slotCamera.enabled = false;
+
+        if (_uiImageObject != null)
+            _uiImageObject.SetActive(false);
+
+        Debug.Log($"Камера слота {gameObject.name} деактивирована");
+    }
+
+    private IEnumerator ShowCameraCoroutine()
+    {
+        if (_slotCamera != null)
+            _slotCamera.enabled = true;
+
+        if (_uiImageObject != null)
+            _uiImageObject.SetActive(true);
+
+        Debug.Log($"Камера слота {gameObject.name} активирована на {_cameraDuration} секунд");
+
+        yield return new WaitForSeconds(_cameraDuration);
+
+        if (_slotCamera != null)
+            _slotCamera.enabled = false;
+
+        if (_uiImageObject != null)
+            _uiImageObject.SetActive(false);
+
+        _cameraCoroutine = null;
+
+        Debug.Log($"Камера слота {gameObject.name} деактивирована по таймеру");
+    }
+
+    public void ToggleSlotCamera()
+    {
+        if (_slotCamera != null && _slotCamera.enabled)
+            DeactivateSlotCamera();
+        else
+            ActivateSlotCamera();
     }
 
     private void OnDrawGizmosSelected()

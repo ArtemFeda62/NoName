@@ -7,7 +7,6 @@ public class Laser : MonoBehaviour
     [SerializeField] private float _maxDistance = 100f;
     [SerializeField] private LayerMask _collisionLayers = -1;
     [SerializeField] private bool _infiniteLength = true;
-    [SerializeField] private float _damageInterval = 0.1f;
 
     [Header("Визуал")]
     [SerializeField] private LineRenderer _lineRenderer;
@@ -21,9 +20,6 @@ public class Laser : MonoBehaviour
     private AudioSource _audioSource;
 
     private Vector3 _laserEndPoint;
-    private GameObject _currentHitObject;
-    private LaserDestroyable _currentDestroyable;
-    private float _damageTimer = 0f;
     private bool _isActive = true;
 
     private void Start()
@@ -59,19 +55,7 @@ public class Laser : MonoBehaviour
     private void Update()
     {
         if (!_isActive) return;
-
         UpdateLaser();
-
-        if (_currentDestroyable != null)
-        {
-            _damageTimer += Time.deltaTime;
-
-            if (_damageTimer >= _damageInterval)
-            {
-                _damageTimer = 0f;
-                _currentDestroyable.OnLaserHit();
-            }
-        }
     }
 
     private void UpdateLaser()
@@ -85,37 +69,47 @@ public class Laser : MonoBehaviour
         if (Physics.Raycast(ray, out hit, _maxDistance, _collisionLayers))
         {
             _laserEndPoint = hit.point;
-            _currentHitObject = hit.collider.gameObject;
 
-            _currentDestroyable = _currentHitObject.GetComponent<LaserDestroyable>();
-            if(_currentDestroyable != null && _currentDestroyable.GetComponent<PlayerController>()!= null)
+            // Проверяем игрока
+            PlayerController player = hit.collider.GetComponent<PlayerController>();
+            if (player != null)
             {
-                Time.timeScale = 1f;
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-            }
-            if (_hitParticles != null)
-            {
-                _hitParticles.transform.position = hit.point;
-                _hitParticles.transform.rotation = Quaternion.LookRotation(hit.normal);
-
-                if (!_hitParticles.isPlaying && _currentDestroyable != null)
-                    _hitParticles.Play();
+                PlayerDeath playerDeath = hit.collider.GetComponent<PlayerDeath>();
+                if (playerDeath != null)
+                {
+                    playerDeath.TeleportToCheckpoint();
+                }
+                return;
             }
 
-            if (_audioSource != null && _hitSound != null && !_audioSource.isPlaying && _currentDestroyable != null)
+            // Проверяем объект с LaserDestroyable
+            LaserDestroyable destroyable = hit.collider.GetComponent<LaserDestroyable>();
+            if (destroyable != null)
             {
-                _audioSource.PlayOneShot(_hitSound, 0.3f);
+                destroyable.OnLaserHit();
+
+                if (_hitParticles != null)
+                {
+                    _hitParticles.transform.position = hit.point;
+                    _hitParticles.transform.rotation = Quaternion.LookRotation(hit.normal);
+                    if (!_hitParticles.isPlaying)
+                        _hitParticles.Play();
+                }
+
+                if (_audioSource != null && _hitSound != null && !_audioSource.isPlaying)
+                {
+                    _audioSource.PlayOneShot(_hitSound, 0.3f);
+                }
+            }
+            else
+            {
+                if (_hitParticles != null && _hitParticles.isPlaying)
+                    _hitParticles.Stop();
             }
         }
         else
         {
-            if (_infiniteLength)
-                _laserEndPoint = startPoint + direction * _maxDistance;
-            else
-                _laserEndPoint = startPoint + direction * _maxDistance;
-
-            _currentHitObject = null;
-            _currentDestroyable = null;
+            _laserEndPoint = startPoint + direction * _maxDistance;
 
             if (_hitParticles != null && _hitParticles.isPlaying)
                 _hitParticles.Stop();
@@ -134,8 +128,6 @@ public class Laser : MonoBehaviour
         {
             if (_hitParticles != null && _hitParticles.isPlaying)
                 _hitParticles.Stop();
-            _currentHitObject = null;
-            _currentDestroyable = null;
         }
     }
 

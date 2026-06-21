@@ -7,6 +7,7 @@ TagManager:
   - LampSlot
   - ButtonPlate
   - Cube
+  - Lava
   layers:
   - Default
   - TransparentFX
@@ -17,8 +18,8 @@ TagManager:
   - ChangerGravity
   - Post-Proccesing
   - ButtonPlate
-  - 
-  - 
+  - Player
+  - Lava
   - 
   - 
   - 

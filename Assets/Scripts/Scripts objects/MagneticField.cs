@@ -6,12 +6,8 @@ public class MagneticField : MonoBehaviour
     [Header("Настройки магнита")]
     [SerializeField] private float _magneticForce = 20f;
     [SerializeField] private float _maxSpeed = 8f;
-    [SerializeField] private float _stopDistance = 0.5f;
+    [SerializeField] private float _stopDistance = 0.3f;
     [SerializeField] private LayerMask _magneticLayers = -1;
-
-    [Header("Точки притяжения")]
-    [SerializeField] private Transform _attractionPoint;
-    [SerializeField] private Vector3 _attractionOffset = new Vector3(0, 0.5f, 0);
 
     [Header("Эффекты")]
     [SerializeField] private ParticleSystem _magneticParticles;
@@ -22,13 +18,11 @@ public class MagneticField : MonoBehaviour
     private List<Rigidbody> _objectsInField = new List<Rigidbody>();
     private float _lastSoundTime = 0f;
     private BoxCollider _boxCollider;
-    private Vector3 _attractionCenter;
+
+    private bool _isActive = true;
 
     private void Start()
     {
-        if (_attractionPoint == null)
-            _attractionPoint = transform;
-
         _boxCollider = GetComponent<BoxCollider>();
         if (_boxCollider == null)
         {
@@ -40,42 +34,46 @@ public class MagneticField : MonoBehaviour
 
         if (_audioSource == null)
             _audioSource = GetComponent<AudioSource>();
-
-        UpdateAttractionCenter();
     }
 
-    private void UpdateAttractionCenter()
+    public void SetActive(bool active)
     {
-        Vector3 center = _boxCollider.center;
-        Vector3 size = _boxCollider.size;
+        _isActive = active;
 
-        Vector3 localSurfacePoint = center + new Vector3(0, size.y / 2, 0);
-
-        _attractionCenter = transform.TransformPoint(localSurfacePoint) + _attractionOffset;
-
-        if (_attractionPoint != null && _attractionPoint != transform)
+        if (!active)
         {
-            _attractionCenter = _attractionPoint.position + _attractionOffset;
+            ReleaseAllObjects();
+            if (_magneticParticles != null && _magneticParticles.isPlaying)
+                _magneticParticles.Stop();
         }
+        else
+        {
+            if (_magneticParticles != null && !_magneticParticles.isPlaying)
+                _magneticParticles.Play();
+        }
+
+        Debug.Log($"Магнит {gameObject.name} {(active ? "включен" : "выключен")}");
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        if (!_isActive) return;
         if (!IsMagneticObject(other)) return;
 
         Rigidbody rb = other.attachedRigidbody;
         if (rb != null && !_objectsInField.Contains(rb))
         {
             _objectsInField.Add(rb);
-            _audioSource.PlayOneShot(_magneticSound, 0.5f);
+            if (_audioSource != null && _magneticSound != null)
+                _audioSource.PlayOneShot(_magneticSound, 0.5f);
             Debug.Log($"Объект {other.name} попал в магнитное поле");
         }
     }
 
     private void OnTriggerStay(Collider other)
     {
+        if (!_isActive) return;
         if (_objectsInField.Contains(other.attachedRigidbody)) return;
-
         if (!IsMagneticObject(other)) return;
 
         Rigidbody rb = other.attachedRigidbody;
@@ -100,7 +98,7 @@ public class MagneticField : MonoBehaviour
 
     private void FixedUpdate()
     {
-        UpdateAttractionCenter();
+        if (!_isActive) return;
 
         for (int i = _objectsInField.Count - 1; i >= 0; i--)
         {
@@ -112,8 +110,8 @@ public class MagneticField : MonoBehaviour
                 continue;
             }
 
-            Vector3 direction = (_attractionCenter - rb.position).normalized;
-            float distance = Vector3.Distance(rb.position, _attractionCenter);
+            Vector3 closestPoint = GetClosestPointOnSurface(rb.position);
+            float distance = Vector3.Distance(rb.position, closestPoint);
 
             if (distance <= _stopDistance)
             {
@@ -122,6 +120,7 @@ public class MagneticField : MonoBehaviour
                 continue;
             }
 
+            Vector3 direction = (closestPoint - rb.position).normalized;
             rb.AddForce(direction * _magneticForce, ForceMode.Force);
 
             if (rb.linearVelocity.magnitude > _maxSpeed)
@@ -129,14 +128,25 @@ public class MagneticField : MonoBehaviour
                 rb.linearVelocity = rb.linearVelocity.normalized * _maxSpeed;
             }
 
-            if (_magneticParticles != null && !_magneticParticles.isPlaying)
-                _magneticParticles.Play();
-
             if (_audioSource != null && _magneticSound != null && Time.time > _lastSoundTime + _soundCooldown)
             {
                 _lastSoundTime = Time.time;
             }
         }
+    }
+
+    private Vector3 GetClosestPointOnSurface(Vector3 point)
+    {
+        Vector3 localPoint = transform.InverseTransformPoint(point);
+        Vector3 halfSize = _boxCollider.size / 2f;
+        Vector3 center = _boxCollider.center;
+
+        float clampedX = Mathf.Clamp(localPoint.x, center.x - halfSize.x, center.x + halfSize.x);
+        float clampedY = Mathf.Clamp(localPoint.y, center.y - halfSize.y, center.y + halfSize.y);
+        float surfaceZ = center.z - halfSize.z;
+
+        Vector3 closestLocal = new Vector3(clampedX, clampedY, surfaceZ);
+        return transform.TransformPoint(closestLocal);
     }
 
     private bool IsMagneticObject(Collider other)
@@ -164,19 +174,13 @@ public class MagneticField : MonoBehaviour
     {
         if (_boxCollider != null)
         {
-            Gizmos.color = Color.magenta;
-            Vector3 center = transform.TransformPoint(_boxCollider.center);
-            Vector3 size = _boxCollider.size;
-            Vector3 topCenter = center + transform.up * (size.y / 2);
-
-            Gizmos.DrawWireSphere(topCenter + _attractionOffset, _stopDistance);
-
             Gizmos.color = new Color(1f, 0f, 1f, 0.2f);
             Gizmos.matrix = transform.localToWorldMatrix;
             Gizmos.DrawWireCube(_boxCollider.center, _boxCollider.size);
 
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(center, topCenter + _attractionOffset);
+            Gizmos.color = Color.blue;
+            Vector3 center = transform.TransformPoint(_boxCollider.center);
+            Gizmos.DrawRay(center, -transform.forward * 2f);
         }
     }
 }

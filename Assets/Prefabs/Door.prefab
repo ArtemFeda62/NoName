@@ -274,7 +274,7 @@ GameObject:
   - component: {fileID: 937962906473612023}
   - component: {fileID: 3871835913926062125}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: LampSlot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -310,6 +310,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LampSlot
   _lampHolderPoint: {fileID: 3618479539474088388}
   _lampOffset: {x: 0, y: 0.3, z: 0}
+  _slotCamera: {fileID: 0}
+  _renderTexture: {fileID: 0}
+  _uiImageObject: {fileID: 0}
+  _cameraDuration: 2
   OnLampTurnedOn:
     m_PersistentCalls:
       m_Calls:
@@ -599,7 +603,7 @@ GameObject:
   - component: {fileID: 4399705017328998508}
   - component: {fileID: 5444374646328412927}
   m_Layer: 0
-  m_Name: LampSlot
+  m_Name: Block
   m_TagString: LampSlot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

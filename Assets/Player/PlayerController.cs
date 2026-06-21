@@ -4,15 +4,16 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    #region Поля и компоненты
-
     [Header("Movement")]
     [SerializeField] private float _walkSpeed = 5f;
     [SerializeField] private float _sprintSpeed = 10f;
     [SerializeField] private float _jumpHeight = 2f;
-    [SerializeField] private float _gravity = -9.81f;
-    [SerializeField] private float _jumpFallMultiplier = 2.5f;
-    [SerializeField] private float _lowJumpMultiplier = 2f;
+    [SerializeField] private float _gravity = -25f;
+    [SerializeField] private float _jumpFallMultiplier = 4f;
+    [SerializeField] private float _lowJumpMultiplier = 3f;
+
+    [Header("Jump")]
+    [SerializeField] private float _jumpCooldown = 0.3f;
 
     [Header("Stamina")]
     [SerializeField] private float _maxStamina = 10f;
@@ -23,7 +24,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private CharacterController _characterController;
     [SerializeField] private CinemachineCamera _cinemachineCamera;
 
-    [Header("GroundСheck")]
+    [Header("GroundCheck")]
     [SerializeField] private Transform _groundCheck;
     [SerializeField] private float _groundDistance = 0.4f;
     [SerializeField] private LayerMask _groundMask;
@@ -35,22 +36,26 @@ public class PlayerController : MonoBehaviour
     private bool _isRunning;
     private float _stamina;
     private float _staminaTimer;
-    private float _fallTimer;
-    private readonly float _terminalVelocity = 20f;
     private bool _isJumping;
     private bool _isJumpButtonPressed;
-
-    #endregion
-
-    #region Жизненный цикл (Unity Events)
+    private float _jumpTimer;
 
     private void Start()
     {
-        InitializePlayer();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        _currentSpeed = _walkSpeed;
+        _stamina = _maxStamina;
+
+        if (_groundCheck == null)
+            _groundCheck = transform;
     }
 
     private void Update()
     {
+        if (_jumpTimer > 0)
+            _jumpTimer -= Time.deltaTime;
+
         UpdateStamina();
         HandleInput();
         ApplyJumpPhysics();
@@ -62,25 +67,6 @@ public class PlayerController : MonoBehaviour
         ApplyGravity();
         MoveCharacter();
     }
-
-    #endregion
-
-    #region Инициализация
-
-    private void InitializePlayer()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        _currentSpeed = _walkSpeed;
-        _stamina = _maxStamina;
-
-        if (_groundCheck == null)
-            _groundCheck = transform;
-    }
-
-    #endregion
-
-    #region Движение и физика
 
     private void MoveCharacter()
     {
@@ -98,12 +84,7 @@ public class PlayerController : MonoBehaviour
         if (_isGrounded && _velocity.y < 0)
         {
             _velocity.y = -2f;
-            _fallTimer = 0f;
             _isJumping = false;
-        }
-        else
-        {
-            _fallTimer += Time.fixedDeltaTime;
         }
     }
 
@@ -112,26 +93,26 @@ public class PlayerController : MonoBehaviour
         if (_isGrounded && _velocity.y < 0)
         {
             _velocity.y = -2f;
+            return;
         }
-        else
-        {
-            _velocity.y += _gravity * Time.fixedDeltaTime;
-            _velocity.y = Mathf.Max(_velocity.y, -_terminalVelocity);
-        }
+
+        _velocity.y += _gravity * Time.fixedDeltaTime;
+
+        if (_velocity.y < -30f)
+            _velocity.y = -30f;
     }
 
     private void ApplyJumpPhysics()
     {
-        if (_isJumping)
+        if (!_isJumping) return;
+
+        if (_velocity.y < 0)
         {
-            if (_velocity.y < 0)
-            {
-                _velocity.y += _gravity * _jumpFallMultiplier * Time.deltaTime;
-            }
-            else if (_velocity.y > 0 && !_isJumpButtonPressed)
-            {
-                _velocity.y += _gravity * _lowJumpMultiplier * Time.deltaTime;
-            }
+            _velocity.y += _gravity * _jumpFallMultiplier * Time.deltaTime;
+        }
+        else if (_velocity.y > 0 && !_isJumpButtonPressed)
+        {
+            _velocity.y += _gravity * _lowJumpMultiplier * Time.deltaTime;
         }
     }
 
@@ -148,10 +129,6 @@ public class PlayerController : MonoBehaviour
         right.y = 0;
         return right.normalized;
     }
-
-    #endregion
-
-    #region Выносливость (Stamina)
 
     private void UpdateStamina()
     {
@@ -177,10 +154,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    #endregion
-
-    #region Обработка ввода (Input System)
-
     private void HandleInput()
     {
         if (_isRunning && _stamina < 1)
@@ -199,10 +172,11 @@ public class PlayerController : MonoBehaviour
     {
         _isJumpButtonPressed = value.isPressed;
 
-        if (_isGrounded && value.isPressed)
+        if (_isGrounded && value.isPressed && _jumpTimer <= 0)
         {
             _velocity.y = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
             _isJumping = true;
+            _jumpTimer = _jumpCooldown;
         }
     }
 
@@ -219,6 +193,4 @@ public class PlayerController : MonoBehaviour
             _currentSpeed = _walkSpeed;
         }
     }
-
-    #endregion
 }
